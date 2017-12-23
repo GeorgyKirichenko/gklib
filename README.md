@@ -13,8 +13,7 @@ for nonblocking (non-sleep) implementation of a file read/write/sync.
 
 ## API
 
-### ```int
-io_ctx_create(struct io_ctx *io_ctx, int capacity, int (*wait_cb)(int wait_fd));```
+### `int io_ctx_create(struct io_ctx *io_ctx, int capacity, int (*wait_cb)(int wait_fd));`
 
 Create an AIO context.
 
@@ -29,8 +28,7 @@ Create an AIO context.
  - 0 for success
  - a negative errno
 
-### ```int
-io_ctx_process(struct io_ctx *io_ctx);```
+### `int io_ctx_process(struct io_ctx *io_ctx);`
 
 Process completed aio requests. Retrieve all completed requests and call corresponding completion callbacks.
 
@@ -43,8 +41,7 @@ Process completed aio requests. Retrieve all completed requests and call corresp
  - count of competed ios
  - negative errno
 
-### ```void
-io_ctx_destroy(struct io_ctx *io_ctx);```
+### `void io_ctx_destroy(struct io_ctx *io_ctx);`
 
 Wait until all active ios are done and destroy AIO context.
 
@@ -52,9 +49,7 @@ Wait until all active ios are done and destroy AIO context.
 
  - io_ctx - pointer to a context structure
 
-### ```int
-io_ctx_write(struct io_ctx *io_ctx, int fd, void *data, size_t count, long long offset,
-	     void (*complete_cb)(int result, void *data), void *data_cb);```
+### `int io_ctx_write(struct io_ctx *io_ctx, int fd, void *data, size_t count, long long offset, void (*complete_cb)(int result, void *data), void *data_cb);`
 
 Send a write request.
 
@@ -73,10 +68,7 @@ Send a write request.
  - request key
  - negative errno
 
-### ```int
-io_ctx_pwrite(struct io_ctx *io_ctx, int fd, const struct iovec *iov, int iovcnt,
-	      long long offset,
-	      void (*complete_cb)(int result, void *data), void *data_cb);```
+### `int io_ctx_pwrite(struct io_ctx *io_ctx, int fd, const struct iovec *iov, int iovcnt, long long offset, void (*complete_cb)(int result, void *data), void *data_cb);`
 
 Send a vector write request.
 
@@ -95,9 +87,7 @@ Send a vector write request.
  - request key
  - negative errno
 
-### ```int
-io_ctx_read(struct io_ctx *io_ctx, int fd, void *data, size_t len, long long offset,
-	    void (*complete_cb)(int result, void *data), void *data_cb);```
+### `int io_ctx_read(struct io_ctx *io_ctx, int fd, void *data, size_t len, long long offset, void (*complete_cb)(int result, void *data), void *data_cb);`
 
 Send a read request.
 
@@ -116,10 +106,7 @@ Send a read request.
  - request key
  - negative errno
 
-### ```int
-io_ctx_pread(struct io_ctx *io_ctx, int fd, const struct iovec *iov, int iovcnt,
-	     long long offset,
-	     void (*complete_cb)(int result, void *data), void *data_cb);```
+### `int io_ctx_pread(struct io_ctx *io_ctx, int fd, const struct iovec *iov, int iovcnt, long long offset, void (*complete_cb)(int result, void *data), void *data_cb);`
 
 Send a vector read request.
 
@@ -138,9 +125,7 @@ Send a vector read request.
  - request key
  - negative errno
 
-### ```int
-io_ctx_fsync(struct io_ctx *io_ctx, int fd,
-	     void (*sync_cb)(int result, void *data), void *data_cb);```
+### `int io_ctx_fsync(struct io_ctx *io_ctx, int fd, void (*sync_cb)(int result, void *data), void *data_cb);`
 
 Send a file sync request.
 
@@ -156,9 +141,7 @@ Send a file sync request.
  - request key
  - negative errno
 
-### ```int
-io_ctx_fdsync(struct io_ctx *io_ctx, int fd,
-	      void (*sync_cb)(int result, void *data), void *data_cb);```
+### `int io_ctx_fdsync(struct io_ctx *io_ctx, int fd, void (*sync_cb)(int result, void *data), void *data_cb);`
 
  Send a file data sync request.
 
@@ -174,8 +157,7 @@ io_ctx_fdsync(struct io_ctx *io_ctx, int fd,
  - request key
  - negative errno
 
-### ```int
-io_ctx_cancel(struct io_ctx *io_ctx, int key);```
+### `int io_ctx_cancel(struct io_ctx *io_ctx, int key);`
 
 Cancel an aio file request.
 
