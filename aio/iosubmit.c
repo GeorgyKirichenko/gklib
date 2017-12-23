@@ -102,7 +102,7 @@ io_ctx_process(struct io_ctx *io_ctx)
 	return completed;
 }
 
-int64_t
+int
 io_ctx_write(struct io_ctx *io_ctx, int fd, void *data, size_t count, long long offset,
 	     void (*complete_cb)(int result, void *data), void *data_cb)
 {
@@ -128,13 +128,13 @@ io_ctx_write(struct io_ctx *io_ctx, int fd, void *data, size_t count, long long 
 	};
 	res = io_submit(io_ctx->ctx, 1, (struct iocb **)&io_req);
 	if (res > 0)
-		return io_req->iocb.key;
+		return io_req - io_ctx->requests;
 	/* Return request. */
 	io_ctx_put_req(io_ctx, io_req);
 	return res;
 }
 
-int64_t
+int
 io_ctx_writev(struct io_ctx *io_ctx, int fd, const struct iovec *iov, int iovcnt,
 	      long long offset,
 	      void (*complete_cb)(int result, void *data), void *data_cb)
@@ -163,13 +163,13 @@ io_ctx_writev(struct io_ctx *io_ctx, int fd, const struct iovec *iov, int iovcnt
 	};
 	res = io_submit(io_ctx->ctx, 1, (struct iocb **)&io_req);
 	if (res > 0)
-		return io_req->iocb.key;
+		return io_req - io_ctx->requests;
 	/* Return request. */
 	io_ctx_put_req(io_ctx, io_req);
 	return res;
 }
 
-int64_t
+int
 io_ctx_read(struct io_ctx *io_ctx, int fd, void *data, size_t count, long long offset,
 	    void (*complete_cb)(int result, void *data), void *data_cb)
 {
@@ -195,13 +195,13 @@ io_ctx_read(struct io_ctx *io_ctx, int fd, void *data, size_t count, long long o
 	};
 	res = io_submit(io_ctx->ctx, 1, (struct iocb **)&io_req);
 	if (res > 0)
-		return io_req->iocb.key;
+		return io_req - io_ctx->requests;
 	/* Return request. */
 	io_ctx_put_req(io_ctx, io_req);
 	return res;
 }
 
-int64_t
+int
 io_ctx_readv(struct io_ctx *io_ctx, int fd, const struct iovec *iov, int iovcnt,
 	     long long offset,
 	     void (*complete_cb)(int result, void *data), void *data_cb)
@@ -230,13 +230,13 @@ io_ctx_readv(struct io_ctx *io_ctx, int fd, const struct iovec *iov, int iovcnt,
 	};
 	res = io_submit(io_ctx->ctx, 1, (struct iocb **)&io_req);
 	if (res > 0)
-		return io_req->iocb.key;
+		return io_req - io_ctx->requests;
 	/* Return request. */
 	io_ctx_put_req(io_ctx, io_req);
 	return res;
 }
 
-int64_t
+int
 io_ctx_fsync(struct io_ctx *io_ctx, int fd,
 	    void (*complete_cb)(int result, void *data), void *data_cb)
 {
@@ -259,13 +259,13 @@ io_ctx_fsync(struct io_ctx *io_ctx, int fd,
 	};
 	res = io_submit(io_ctx->ctx, 1, (struct iocb **)&io_req);
 	if (res > 0)
-		return io_req->iocb.key;
+		return io_req - io_ctx->requests;
 	/* Return request. */
 	io_ctx_put_req(io_ctx, io_req);
 	return res;
 }
 
-int64_t
+int
 io_ctx_fdsync(struct io_ctx *io_ctx, int fd,
 	      void (*complete_cb)(int result, void *data), void *data_cb)
 {
@@ -288,8 +288,25 @@ io_ctx_fdsync(struct io_ctx *io_ctx, int fd,
 	};
 	res = io_submit(io_ctx->ctx, 1, (struct iocb **)&io_req);
 	if (res > 0)
-		return io_req->iocb.key;
+		return io_req - io_ctx->requests;
 	/* Return request. */
 	io_ctx_put_req(io_ctx, io_req);
+	return res;
+}
+
+int
+io_ctx_cancel(struct io_ctx *io_ctx, int key)
+{
+	struct io_event event;
+	struct io_req *io_req;
+	io_req = io_ctx->requests + key;
+	int res = io_cancel(io_ctx->ctx, &io_req->iocb, &event);
+
+	if (res == 0) {
+		io_req->complete_cb(event.res, io_req->data_cb);
+		/* Return request to the pool. */
+		io_ctx_put_req(io_ctx, io_req);
+		return 0;
+	}
 	return res;
 }

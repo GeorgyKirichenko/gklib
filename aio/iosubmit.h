@@ -30,7 +30,7 @@ struct io_ctx {
 	int event_fd;
 	/* Wait callback for completions. */
 	int (*wait_cb)(int wait_fd);
-	/* Count of issued requests, uses as key sequence for ios. */
+	/* Count of issued requests, used as key sequence for ios. */
 	int64_t req_cnt;
 	/* Requests storage. */
 	struct io_req *requests;
@@ -75,7 +75,7 @@ io_ctx_destroy(struct io_ctx *io_ctx);
  * data_cb - completion callback data
  * Return request key or negative errno.
  */
-int64_t
+int
 io_ctx_write(struct io_ctx *io_ctx, int fd, void *data, size_t count, long long offset,
 	     void (*complete_cb)(int result, void *data), void *data_cb);
 
@@ -90,7 +90,7 @@ io_ctx_write(struct io_ctx *io_ctx, int fd, void *data, size_t count, long long 
  * data_cb - completion callback data
  * Return request key or negative errno.
  */
-int64_t
+int
 io_ctx_pwrite(struct io_ctx *io_ctx, int fd, const struct iovec *iov, int iovcnt,
 	      long long offset,
 	      void (*complete_cb)(int result, void *data), void *data_cb);
@@ -106,7 +106,7 @@ io_ctx_pwrite(struct io_ctx *io_ctx, int fd, const struct iovec *iov, int iovcnt
  * data_cb - completion callback data
  * Return request key or negative errno.
  */
-int64_t
+int
 io_ctx_read(struct io_ctx *io_ctx, int fd, void *data, size_t len, long long offset,
 	    void (*complete_cb)(int result, void *data), void *data_cb);
 
@@ -121,7 +121,7 @@ io_ctx_read(struct io_ctx *io_ctx, int fd, void *data, size_t len, long long off
  * data_cb - completion callback data
  * Return request key or negative errno.
  */
-int64_t
+int
 io_ctx_pread(struct io_ctx *io_ctx, int fd, const struct iovec *iov, int iovcnt,
 	     long long offset,
 	     void (*complete_cb)(int result, void *data), void *data_cb);
@@ -134,7 +134,7 @@ io_ctx_pread(struct io_ctx *io_ctx, int fd, const struct iovec *iov, int iovcnt,
  * data_cb - completion callback data
  * Return request key or negative errno.
  */
-int64_t
+int
 io_ctx_fsync(struct io_ctx *io_ctx, int fd,
 	     void (*sync_cb)(int result, void *data), void *data_cb);
 
@@ -146,8 +146,17 @@ io_ctx_fsync(struct io_ctx *io_ctx, int fd,
  * data_cb - completion callback data
  * Return request key or negative errno.
  */
-int64_t
+int
 io_ctx_fdsync(struct io_ctx *io_ctx, int fd,
 	      void (*sync_cb)(int result, void *data), void *data_cb);
+
+/*
+ * Cancel an aio file request.
+ * io_ctx - pointer to a context structure
+ * key - key of a previous issued io
+ * Return 0 for success or negative errno.
+ */
+int
+io_ctx_cancel(struct io_ctx *io_ctx, int key);
 
 #endif
